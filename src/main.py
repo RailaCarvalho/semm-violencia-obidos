@@ -861,32 +861,138 @@ def tela_inicial(page):
                 tipo_familia,
         
                 botoes_navegacao()
-            ],
-            scroll="auto"
+            ]
             ),
             expand=True
         )
+
+        #========Funções necessárias pro funcionamento dos DADOS EDUCACIONAIS========
+        escolaridade = ft.Dropdown(
+            label="Escolaridade",
+            options=[
+                ft.dropdown.Option("Fundamental incompleto"),
+                ft.dropdown.Option("Fundamental completo"),
+                ft.dropdown.Option("Médio incompleto"),
+                ft.dropdown.Option("Médio completo"),
+                ft.dropdown.Option("Superior incompleto"),
+                ft.dropdown.Option("Superior completo"),
+            ],
+            width=400
+        )
+
+        estuda_radio = ft.RadioGroup(
+            content=ft.Row([
+                ft.Radio(value="Sim", label="Sim"),
+                ft.Radio(value="Não", label="Não"),
+            ])
+        )
+
+        # Campos de Instituição e Turno (inicialmente ocultos)
+        instituicao_turno = ft.Row([
+            ft.TextField(label="Instituição", width=400),
+            ft.Dropdown(label="Turno", options=[
+                    ft.dropdown.Option("Manhã"),
+                    ft.dropdown.Option("Tarde"),
+                    ft.dropdown.Option("Noite")
+                ]),
+        ], visible=False)
+
+        # Motivos para ter parado de estudar
+        parou_motivo = ft.Column([
+            ft.Text("Identificar o motivo:"),
+            ft.Row([
+                ft.Checkbox(label="Não há vagas"),
+                ft.Checkbox(label="Escola distante"),
+                ft.Checkbox(label="Trabalho"),
+                ft.Checkbox(label="Falta de interesse próprio"),
+                ft.Checkbox(label="Problemas de saúde"),
+                ft.Checkbox(label="Desinteresse dos pais e/ou responsáveis"),
+            ]),
+            ft.TextField(label="Outros", width=400),
+        ], visible=False)
+
+        def toggle_estudo_fields(e):
+            estuda = estuda_radio.value
+            instituicao_turno.visible = estuda == "Sim"
+            parou_motivo.visible = estuda == "Não"
+            page.update()
+
+        estuda_radio.on_change = toggle_estudo_fields
+
+        # Esportes
+        pratica_esporte = ft.RadioGroup(
+            content=ft.Row([
+                ft.Radio(value="Sim", label="Sim"),
+                ft.Radio(value="Não", label="Não"),
+            ])
+        )
+
+        esportes_opcoes = ft.Column([
+            ft.Row([
+                ft.Checkbox(label="Futebol"),
+                ft.Checkbox(label="Vôlei"),
+                ft.Checkbox(label="Handball"),
+                ft.Checkbox(label="Basquete"),
+                ft.Checkbox(label="Natação"),
+                ft.Checkbox(label="Capoeira"),
+                ft.Checkbox(label="Artes Marciais"),
+                ft.Checkbox(label="Skate"),
+            ]),
+            ft.TextField(label="Outros", width=400),
+        ], visible=False)
+
+        def toggle_esportes(e):
+            esportes_opcoes.visible = pratica_esporte.value == "Sim"
+            page.update()
+
+        pratica_esporte.on_change = toggle_esportes
+
+        # Projetos
+        participa_projetos = ft.RadioGroup(
+            content=ft.Row([
+                ft.Radio(value="Sim", label="Sim"),
+                ft.Radio(value="Não", label="Não"),
+            ])
+        )
+
+        projetos_opcoes = ft.Column([
+            ft.Row([
+                ft.Checkbox(label="APETI"),
+                ft.Checkbox(label="PBF"),
+                ft.Checkbox(label="PROJOVEM"),
+                ft.Checkbox(label="PRONATEC"),
+                ft.Checkbox(label="SUA CASA"),
+            ]),
+            ft.Row([
+                ft.TextField(label="Outros programas", width=300),
+                ft.TextField(label="Valor R$", width=150),
+            ]),
+        ], visible=False)
+
+        def toggle_projetos(e):
+            projetos_opcoes.visible = participa_projetos.value == "Sim"
+            page.update()
+
+        participa_projetos.on_change = toggle_projetos
 
         # Dados educacionais
         aba_dados_educacionais = ft.Container(
             padding=ft.padding.only(top=20),
             content=ft.Column([
-                ft.Dropdown(label="Escolaridade", options=[
-                    ft.dropdown.Option("Ensino Fundamental"),
-                    ft.dropdown.Option("Ensino Médio"),
-                    ft.dropdown.Option("Superior"),
-                    ft.dropdown.Option("Não alfabetizada")
-                ]),
-                ft.RadioGroup(content=ft.Row([
-                    ft.Radio(label="Está frequentando a escola?", value="Sim"),
-                    ft.Radio(label="Não", value="Não")
-                ])),
-                ft.TextField(label="Nome da instituição"),
-                ft.Dropdown(label="Turno", options=[
-                    ft.dropdown.Option("Manhã"),
-                    ft.dropdown.Option("Tarde"),
-                    ft.dropdown.Option("Noite")
-                ]),
+                escolaridade,
+                ft.Text("Estuda atualmente?"),
+                estuda_radio,
+                instituicao_turno,
+                parou_motivo,
+                ft.Divider(),
+                ft.Text("Pratica algum esporte?"),
+                pratica_esporte,
+                esportes_opcoes,
+                ft.Divider(),
+                ft.Text("Participa de algum programa ou projeto?"),
+                participa_projetos,
+                projetos_opcoes,
+
                 botoes_navegacao()
             ],
             scroll="auto"
@@ -894,26 +1000,154 @@ def tela_inicial(page):
             expand=True
         )
 
-        # Situação do caso
+        #======Área para funções da aba SITUAÇÃO DO CASO=======
+
+        #-------Parte da situação de SAÚDE---------
+        # Pergunta principal
+        sofreu_violencia = ft.RadioGroup(
+            content=ft.Row([
+                ft.Radio(value="Sim", label="Sim"),
+                ft.Radio(value="Não", label="Não"),
+            ])
+        )
+
+        # Tipo de violência
+        tipos_violencia = ft.Column([
+            ft.Text("Tipo de violência:", size=16, weight=ft.FontWeight.BOLD),
+            ft.Row([
+                ft.Checkbox(label="Violência Sexual"),
+                ft.Checkbox(label="Abuso sexual"),
+                ft.Checkbox(label="Exploração sexual"),
+                ft.Checkbox(label="Violência Psicológica"),
+                ft.Checkbox(label="Violência física"),
+                ft.Checkbox(label="Negligência"),
+            ]),
+            
+            ft.TextField(label="Outros", width=400),
+        ], visible=False)
+
+        # Agressor
+        agressores = ft.Column([
+            ft.Text("Agressor:", size=16, weight=ft.FontWeight.BOLD),
+            ft.Row([
+                ft.Checkbox(label="Pai"),
+                ft.Checkbox(label="Mãe"),
+                ft.Checkbox(label="Padrasto"),
+                ft.Checkbox(label="Madrasta"),
+                ft.Checkbox(label="Tio"),
+                ft.Checkbox(label="Tia"),
+                ft.Checkbox(label="Avô"),
+                ft.Checkbox(label="Avó"),
+                ft.Checkbox(label="Irmão"),
+                ft.Checkbox(label="Irmã"),
+            ]),
+            
+            ft.TextField(label="Outros", width=400),
+        ], visible=False)
+
+        # Local da violência
+        local_violencia = ft.Column([
+            ft.Text("Onde ocorreu a violência?", size=16, weight=ft.FontWeight.BOLD),
+            ft.Row([
+                ft.Checkbox(label="Residência da família"),
+                ft.Checkbox(label="Escola"),
+                ft.Checkbox(label="Rua"),
+                ft.Checkbox(label="NSA"),
+                ft.Checkbox(label="NQR"),
+            ]),
+            
+            ft.TextField(label="Outros", width=400),
+        ], visible=False)
+
+        # Atualiza visibilidade dos campos
+        def toggle_violencia_fields(e):
+            visivel = sofreu_violencia.value == "Sim"
+            tipos_violencia.visible = visivel
+            agressores.visible = visivel
+            local_violencia.visible = visivel
+            page.update()
+
+        sofreu_violencia.on_change = toggle_violencia_fields
+
+        #------Parte da situação de SAÚDE------
+        # Pergunta principal
+        saude = ft.RadioGroup(
+            content=ft.Row([
+                ft.Radio(value="Sim", label="Sim"),
+                ft.Radio(value="Não", label="Não"),
+            ])
+        )
+
+        # Campos que aparecem somente se marcar "Sim"
+        campos_saude = ft.Column([
+            ft.TextField(label="Doenças atuais", multiline=True, width=500),
+            ft.TextField(label="Uso de medicação controlada", multiline=True, width=500),
+            ft.TextField(label="Tem cartão de vacina?", width=300),
+        ], visible=False)
+
+        # Função para mostrar ou esconder os campos
+        def toggle_campos_saude(e):
+            campos_saude.visible = saude.value == "Sim"
+            page.update()
+
+        saude.on_change = toggle_campos_saude
+
+        #-------Parte da situação de DROGRADIÇÃO----------
+
+        # Pergunta principal
+        consome_drogas = ft.RadioGroup(
+            content=ft.Row([
+                ft.Radio(value="Sim", label="Sim"),
+                ft.Radio(value="Não", label="Não")
+            ])
+        )
+
+        # Campos que só aparecem se marcar "Sim"
+        tipos_droga = ft.Column([
+            ft.Text("Qual tipo de substância que consome?"),
+            ft.Row([
+                ft.Checkbox(label="Cola de sapateiro"),
+                ft.Checkbox(label="Maconha"),
+                ft.Checkbox(label="Álcool"),
+                ft.Checkbox(label="Medicamento"),
+                ft.Checkbox(label="Tinner ou similar"),
+                ft.Checkbox(label="Cocaína"),
+                ft.Checkbox(label="Cigarro"),
+            ]),
+            
+            ft.TextField(label="Outros", multiline=True, width=400),
+        ], visible=False)
+
+        # Atualiza visibilidade dos campos com base na resposta
+        def atualizar_campos(e):
+            tipos_droga.visible = consome_drogas.value == "Sim"
+            page.update()
+        
+        consome_drogas.on_change = atualizar_campos
+
+        # =======Aba Situação do caso=================
         aba_situacao_caso = ft.Container(
             padding=ft.padding.only(top=20),
             content=ft.Column([
-                ft.Text("Situação de violência", size=16, weight="bold"),
-                ft.TextField(label="Tipo de violência"),
-                ft.TextField(label="Autor da violência"),
-                ft.TextField(label="Frequência"),
+                ft.Text("SITUAÇÃO DE VIOLÊNCIA", size=16, weight=ft.FontWeight.BOLD),
+                ft.Text("Sofreu algum tipo de violência?", size=16),
+                sofreu_violencia,
+                tipos_violencia,
+                agressores,
+                local_violencia,
+                ft.Divider(),
+                
+                ft.Text("SITUAÇÃO DE SAÚDE", size=16, weight=ft.FontWeight.BOLD),
+                ft.Text("Possui alguma condição de saúde relevante?", size=16),
+                saude,
+                campos_saude,
                 ft.Divider(),
 
-                ft.Text("Situação de saúde", size=16, weight="bold"),
-                ft.TextField(label="Problemas de saúde"),
-                ft.TextField(label="Uso de medicamentos"),
-                ft.TextField(label="Já procurou atendimento médico?"),
-                ft.Divider(),
+                ft.Text("SITUAÇÃO DE DROGADIÇÃO", size=16, weight=ft.FontWeight.BOLD),
+                ft.Text("Consome alguma substância que cause dependência química?", size=16),
+                consome_drogas,
+                tipos_droga,
 
-                ft.Text("Situação de drogadição", size=16, weight="bold"),
-                ft.TextField(label="Uso de substâncias"),
-                ft.TextField(label="Frequência"),
-                ft.TextField(label="Faz tratamento?"),
                 botoes_navegacao()
             ],
             scroll="auto"
@@ -921,14 +1155,31 @@ def tela_inicial(page):
             expand=True
         )
 
-        # Encaminhamentos (última aba)
+        #------Elementos da aba de encaminhamentos--------
+        #=======Aba Encaminhamentos (última aba)===========
         aba_encaminhamentos = ft.Container(
             padding=ft.padding.only(top=20),
             content=ft.Column([
-                ft.TextField(label="Encaminhada para"),
-                ft.TextField(label="Data do encaminhamento", hint_text="dd/mm/aaaa"),
-                ft.TextField(label="Responsável pelo atendimento"),
-                ft.TextField(label="Observações"),
+                ft.TextField(
+                    label="Encaminhamentos",
+                    multiline=True,
+                    min_lines=6,
+                    max_lines=12,
+                    expand=True
+                ),
+                ft.Row([
+                    ft.TextField(label="Data", width=200, hint_text="dd/mm/aaaa"),
+                    ft.TextField(label="Responsável pelo atendimento", width=500),
+                ]),
+                
+                ft.TextField(
+                    label="Observações",
+                    multiline=True,
+                    min_lines=2,
+                    max_lines=5,
+                    width=700
+                ),
+
                 botoes_navegacao(mostrar_proximo=False, ultimo=True)
             ],
             scroll="auto"
